@@ -15,7 +15,6 @@
     "bootstrap": "^4.4.1",
     "core-js": "^3.6.4",
     "express": "^4.17.1",
-    "jquery": "^3.5.1",
     "popper.js": "^1.16.1",
     "vue": "^2.6.11"
   },
@@ -34,8 +33,7 @@
       "node": true,
       "browser": true,
       "commonjs": true,
-      "es6": true,
-      "jquery": true
+      "es6": true
     },
     "extends": [
       "plugin:vue/essential",

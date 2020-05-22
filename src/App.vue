@@ -119,7 +119,7 @@
                 </div>
             </div>
         </div>
-        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank" >link of project</a>
+        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank">link of project</a>
     </div>
 </template>
 
@@ -136,9 +136,9 @@
 				iterationByIteration: false,
 				ended: false,
 				step: 1,
-				numberDecisions: 2,
-				numberRestrictions: 3,
-				numberIteractions: 3,
+				numberDecisions: 0,
+				numberRestrictions: 0,
+				numberIteractions: 0,
 				isNegative: false,
 				decisions: [],
 				slack: [],
@@ -210,17 +210,17 @@
 
 				let restrs = [];
 				let restrsB = [];
-				$('.panel-restrictions').each((i, el) => {
+
+				document.getElementsByClassName('panel-restrictions').forEach((el) => {
 					vm.slack.push('F' + el.id);
-
 					restrs[el.id] = [];
-
-					$(el).find('.restrictions').each((iR, elR) => {
+					el.getElementsByClassName('restrictions').forEach((elR) => {
 						if (typeof elR.value != 'undefined')
-							restrs[el.id].push(elR.value);
-					})
-					restrsB[el.id - 1] = $(el).find('.restriction-result').val();
-				})
+							restrs[el.id].push(parseFloat(elR.value));
+					});
+
+					restrsB[el.id - 1] = parseFloat(el.getElementsByClassName('restriction-result')[0].value);
+				});
 
 				this.restrictionsB = restrsB;
 
@@ -231,20 +231,18 @@
 				}
 
 
-				this.objective = [5, 7, 8];
-
-				this.restrictions[0] = [0.30, 0.20, 0.10];
-				this.restrictions[1] = [0.003, 0.005, 0.007];
-				this.restrictions[2] = [0.007, 0.008, 0.010];
-				this.restrictions[3] = [0.033, 0.005, 0.002];
-
-				this.slack = ['F1', 'F2', 'F3', 'F4'];
-				this.decisions = ['X1', 'X2', 'X3'];
-
-				this.restrictionsB[0] = 10000;
-				this.restrictionsB[1] = 1600;
-				this.restrictionsB[2] = 800;
-				this.restrictionsB[3] = 600;
+				// this.objective = [10, 6, 4];
+                //
+				// this.restrictions[0] = [1,1,1];
+				// this.restrictions[1] = [10,4,5];
+				// this.restrictions[2] = [2,2,6];
+                //
+				// this.slack = ['F1', 'F2', 'F3'];
+				// this.decisions = ['X1', 'X2', 'X3'];
+                //
+				// this.restrictionsB[0] = 100;
+				// this.restrictionsB[1] = 600;
+				// this.restrictionsB[2] = 300;
 
 				this.buildSimplex();
 			},
@@ -307,8 +305,10 @@
 				let value = false;
 				let indexGoIn = 0;
 				for (let i in lastLineOfLastIteration) {
-					if (value === false && !isNaN(lastLineOfLastIteration[i]))
+					if (value === false && !isNaN(lastLineOfLastIteration[i])){
 						value = lastLineOfLastIteration[i];
+						indexGoIn = i;
+                    }
 
 					if (lastLineOfLastIteration[i] < value) {
 						value = lastLineOfLastIteration[i];
@@ -364,11 +364,11 @@
 
 					if (iterationActual[~~j + 1][~~index + 1] !== 0 && !isNaN(valueBIteration)) {
 
-						console.log(valueBIteration)
-
-						let actualValue = valueBIteration / iterationActual[~~j + 1][~~index + 1];
-						if (minorValue === false)
+						let actualValue = parseFloat(valueBIteration) / parseFloat(iterationActual[~~j + 1][~~index + 1]);
+						if (minorValue === false && !isNaN(actualValue)){
 							minorValue = actualValue;
+							indexGoOut = j;
+                        }
 
 						if (actualValue < minorValue && actualValue > 0) {
 							minorValue = actualValue;
