@@ -124,8 +124,7 @@
 
 <script>
 
-    // - keypress validation fields
-    // - numbers with a lot of decimal cases
+	// - keypress validation fields
 
 	export default {
 		name: 'App',
@@ -174,6 +173,7 @@
 						return value.toFixed(2);
 					}
 				} catch (e) {
+					console.log('caiu aqui', Number(value).toFixed(2));
 					return value;
 				}
 			},
@@ -230,18 +230,20 @@
 				}
 
 
-				// this.objective = ['10', '6', '4'];
-                //
-				// this.restrictions[0] = ['1', '1', '1'];
-				// this.restrictions[1] = ['10', '4', '5'];
-				// this.restrictions[2] = ['2', '2', '6'];
-                //
-				// this.slack = ['F1', 'F2', 'F3'];
-				// this.decisions = ['X1', 'X2', 'X3'];
-                //
-				// this.restrictionsB[0] = 100;
-				// this.restrictionsB[1] = 600;
-				// this.restrictionsB[2] = 300;
+				this.objective = [5, 7, 8];
+
+				this.restrictions[0] = [0.30, 0.20, 0.10];
+				this.restrictions[1] = [0.003, 0.005, 0.007];
+				this.restrictions[2] = [0.007, 0.008, 0.010];
+				this.restrictions[3] = [0.033, 0.005, 0.002];
+
+				this.slack = ['F1', 'F2', 'F3', 'F4'];
+				this.decisions = ['X1', 'X2', 'X3'];
+
+				this.restrictionsB[0] = 10000;
+				this.restrictionsB[1] = 1600;
+				this.restrictionsB[2] = 800;
+				this.restrictionsB[3] = 600;
 
 				this.buildSimplex();
 			},
@@ -301,9 +303,12 @@
 
 				let lastLineOfLastIteration = this.iterations[this.iterations.length - 1];
 
-				let value = 0;
+				let value = false;
 				let indexGoIn = 0;
 				for (let i in lastLineOfLastIteration) {
+					if (value === false && !isNaN(lastLineOfLastIteration[i]))
+						value = lastLineOfLastIteration[i];
+
 					if (lastLineOfLastIteration[i] < value) {
 						value = lastLineOfLastIteration[i];
 						indexGoIn = i;
@@ -317,7 +322,6 @@
 				let pivot = parseFloat(this.iterations[indexGoOut + 1][indexGoIn]);
 
 				if (pivot === 1) {
-					console.log('aqui');
 					for (let i in outRow) {
 						if (isNaN(outRow[i])) {
 							outRow[i] = inEl;
@@ -351,24 +355,28 @@
 			goOut(index) {
 
 				let iterationActual = this.iterations
-				let minorValue = 99999999;
+				let minorValue = false;
 				let indexGoOut = 0;
 
 				for (let j in this.restrictionsB) {
+					let valueBIteration = this.iterations[j][Object.keys(this.iterations[j]).length - 1];
 
-					if (iterationActual[~~j + 1][~~index + 1] !== 0) {
+					if (iterationActual[~~j + 1][~~index + 1] !== 0 && !isNaN(valueBIteration)) {
 
-						let actualValue = this.restrictionsB[j] / iterationActual[~~j + 1][~~index + 1];
+						console.log(valueBIteration)
+
+						let actualValue = valueBIteration / iterationActual[~~j + 1][~~index + 1];
+						if (minorValue === false)
+							minorValue = actualValue;
 
 						if (actualValue < minorValue && actualValue > 0) {
 							minorValue = actualValue;
 							indexGoOut = j;
 						}
 					}
-
 				}
 
-				if (minorValue === 99999999) {
+				if (!minorValue) {
 					alert('impossible calculation');
 					location.reload();
 				} else {
