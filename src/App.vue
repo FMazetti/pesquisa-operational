@@ -127,8 +127,6 @@
     // - keypress validation fields
     // - numbers with a lot of decimal cases
 
-
-
 	export default {
 		name: 'App',
 		components: {},
@@ -233,14 +231,14 @@
 
 
 				// this.objective = ['10', '6', '4'];
-				//
+                //
 				// this.restrictions[0] = ['1', '1', '1'];
 				// this.restrictions[1] = ['10', '4', '5'];
 				// this.restrictions[2] = ['2', '2', '6'];
-				//
+                //
 				// this.slack = ['F1', 'F2', 'F3'];
 				// this.decisions = ['X1', 'X2', 'X3'];
-				//
+                //
 				// this.restrictionsB[0] = 100;
 				// this.restrictionsB[1] = 600;
 				// this.restrictionsB[2] = 300;
