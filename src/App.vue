@@ -119,7 +119,7 @@
                 </div>
             </div>
         </div>
-        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank">link of project</a>
+<!--        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank">link of project</a>-->
     </div>
 </template>
 
