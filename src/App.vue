@@ -119,7 +119,7 @@
                 </div>
             </div>
         </div>
-<!--        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank">link of project</a>-->
+        <!--        <a href="https://github.com/FMazetti/pesquisa-operational" target="_blank">link of project</a>-->
     </div>
 </template>
 
@@ -136,9 +136,9 @@
 				iterationByIteration: false,
 				ended: false,
 				step: 1,
-				numberDecisions: 0,
-				numberRestrictions: 0,
-				numberIteractions: 0,
+				numberDecisions: 3,
+				numberRestrictions: 2,
+				numberIteractions: 100,
 				isNegative: false,
 				decisions: [],
 				slack: [],
@@ -230,19 +230,18 @@
 					}
 				}
 
-
-				// this.objective = [10, 6, 4];
+				// this.objective = [2, -3];
                 //
-				// this.restrictions[0] = [1,1,1];
-				// this.restrictions[1] = [10,4,5];
-				// this.restrictions[2] = [2,2,6];
+				// this.restrictions[0] = [1, 0];
+				// this.restrictions[1] = [0, 2];
+				// this.restrictions[2] = [3, 2];
                 //
 				// this.slack = ['F1', 'F2', 'F3'];
-				// this.decisions = ['X1', 'X2', 'X3'];
+				// this.decisions = ['X1', 'X2'];
                 //
-				// this.restrictionsB[0] = 100;
-				// this.restrictionsB[1] = 600;
-				// this.restrictionsB[2] = 300;
+				// this.restrictionsB[0] = 4;
+				// this.restrictionsB[1] = 12;
+				// this.restrictionsB[2] = 18;
 
 				this.buildSimplex();
 			},
@@ -293,6 +292,12 @@
 					}
 				}
 
+				for (let i in this.restrictions) {
+					for (let j in this.restrictions[i]) {
+						this.iterations[~~i + 1][~~j + 1] = this.restrictions[i][j];
+					}
+				}
+
 				this.iterations.push(lineBottom);
 				this.step++;
 				if (!this.iterationByIteration)
@@ -305,16 +310,18 @@
 				let value = false;
 				let indexGoIn = 0;
 				for (let i in lastLineOfLastIteration) {
-					if (value === false && !isNaN(lastLineOfLastIteration[i])){
+					if (value === false && !isNaN(lastLineOfLastIteration[i])) {
 						value = lastLineOfLastIteration[i];
-						indexGoIn = i;
-                    }
+						indexGoIn = ~~i;
+					}
 
 					if (lastLineOfLastIteration[i] < value) {
 						value = lastLineOfLastIteration[i];
-						indexGoIn = i;
+						indexGoIn = ~~i;
 					}
 				}
+
+				console.log(indexGoIn);
 
 				let indexGoOut = ~~this.goOut(indexGoIn - 1);
 
@@ -341,10 +348,12 @@
 
 				for (let omg in this.iterations) {
 					if (~~omg !== indexGoOut + 1) {
-						let pivotHere = this.iterations[omg][indexGoIn];
+						let pivotHere = parseFloat(this.iterations[omg][indexGoIn] * -1);
 						for (let j in this.iterations[omg]) {
 							if (!isNaN(this.iterations[omg][j])) {
-								this.iterations[omg][j] = parseFloat(parseFloat(outRow[j]) * parseFloat(pivotHere * -1) + parseFloat(this.iterations[omg][j]));
+								if (pivotHere == -2)
+									console.log(outRow[j], pivotHere, this.iterations[omg][j]);
+								this.iterations[omg][j] = parseFloat((parseFloat(outRow[j]) * pivotHere) + parseFloat(this.iterations[omg][j]));
 							}
 						}
 					}
@@ -359,27 +368,35 @@
 				let minorValue = false;
 				let indexGoOut = 0;
 
-				for (let j in this.restrictionsB) {
+				for (let j = 0; j < this.restrictionsB.length + 1; j++) {
 					let valueBIteration = this.iterations[j][Object.keys(this.iterations[j]).length - 1];
 
-					if (iterationActual[~~j + 1][~~index + 1] !== 0 && !isNaN(valueBIteration)) {
+					let check = ~~j;
 
-						let actualValue = parseFloat(valueBIteration) / parseFloat(iterationActual[~~j + 1][~~index + 1]);
-						if (minorValue === false && !isNaN(actualValue)){
+					if (iterationActual[check][~~index + 1] !== 0 && !isNaN(valueBIteration)) {
+
+						let actualValue = parseFloat(valueBIteration) / parseFloat(iterationActual[check][~~index + 1]);
+						console.log('actualValue', j, actualValue, parseFloat(valueBIteration), parseFloat(iterationActual[check][~~index + 1]));
+						if (minorValue === false && !isNaN(actualValue) && actualValue > 0) {
 							minorValue = actualValue;
-							indexGoOut = j;
-                        }
+							indexGoOut = ~~j - 1;
+						}
 
 						if (actualValue < minorValue && actualValue > 0) {
 							minorValue = actualValue;
-							indexGoOut = j;
+							indexGoOut = ~~j - 1;
 						}
 					}
 				}
 
+
+				// -18
+				console.log(indexGoOut, minorValue);
+
+
 				if (!minorValue) {
-					alert('impossible calculation');
-					location.reload();
+					// alert('impossible calculation');
+					// location.reload();
 				} else {
 					return indexGoOut;
 				}
